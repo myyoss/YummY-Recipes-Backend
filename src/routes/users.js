@@ -20,22 +20,27 @@ router.post("/register", async (req, res) => {
   res.json({ massage: "User Registered Successfully!" });
 });
 
+
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
   const user = await UserModel.findOne({ username });
 
   if (!user) {
-    return res.json({ massage: "User Doesn't Exist!" });
+    return res.send("User Doesn't Exist!");
+    // return res.json({ massage: "User Doesn't Exist!" });
   }
-
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
-  if (!isPasswordValid) {
-    return res.json({ message: "User Password I Incorrect!" });
-  }
+  // console.log(username, password, user, user.password);
+  // console.log(isPasswordValid);
 
-  const token = jwt.sign({ id: user._id }, "secret"); ///CHANCHE "SECRET" TO ENV
-  res.json({ token, userID: user._id });
+  if (!isPasswordValid) {
+    return res.send("User Password Is Incorrect!");
+    // return res.json({ message: "User Password I Incorrect!" });
+  } else {
+    const token = jwt.sign({ id: user._id }, "secret"); ///CHANCHE "SECRET" TO ENV
+    return res.json({ token, userID: user._id });
+  }
 });
 
 export { router as userRouter };
